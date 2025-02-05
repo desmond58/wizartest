@@ -63,6 +63,7 @@ export default function HomeScreen() {
 
   const handleTransactionConnection = async () => {
     try {
+      await handleReleaseResponse();
       const devices = await getDeviceList();
 
       if (devices.length > 0) {
@@ -90,7 +91,7 @@ export default function HomeScreen() {
             requestType: RequestType.FROM_CASHIER,
             content: JSON.stringify(transactionData),
             sequenceNumber: generateSequenceNumber(), // Optional: specific sequence number
-            timeout: 20000 // 20 seconds timeout
+            timeout: 40000 // 30 seconds timeout
           });
 
           if (commandResult.success) {
@@ -115,7 +116,7 @@ export default function HomeScreen() {
           }
 
           // Delay for 3 seconds before closing the connection
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          // await new Promise(resolve => setTimeout(resolve, 2000));
 
           // Close the connection when done
           const closeResult = await closeConnection();
@@ -199,38 +200,92 @@ export default function HomeScreen() {
 
   const handleCancelConnection = async () => {
     try {
-      // const cancelResult = await cancelCommand();
-      // console.log('Cancel command result:', cancelResult.message);
+      const devices = await getDeviceList();
 
-      // if (cancelResult.success) {
-      const commandResult = await sendCommand({
-        requestType: RequestType.CANCEL_REQUEST,
-        content: "",
-        sequenceNumber: generateSequenceNumber(),
-        timeout: 1000
-      });
+      if (devices.length > 0) {
+        const device = devices[0];
+        const result = await openConnection(device.deviceId);
 
-      if (commandResult.success) {
-        let parsedContent = commandResult.parsedData;
-        try {
-          const jsonStartIndex = parsedContent.indexOf('{');
-          if (jsonStartIndex !== -1) {
-            parsedContent = parsedContent.substring(jsonStartIndex);
+        if (result.success) {
+          // const cancelResult = await cancelCommand();
+          // console.log('Cancel command result:', cancelResult.message);
+
+          // if (cancelResult.success) {
+          const commandResult = await sendCommand({
+            requestType: RequestType.CANCEL_REQUEST,
+            content: "",
+            sequenceNumber: generateSequenceNumber(),
+            timeout: 40000
+          });
+
+          if (commandResult.success) {
+            let parsedContent = commandResult.parsedData;
+            try {
+              const jsonStartIndex = parsedContent.indexOf('{');
+              if (jsonStartIndex !== -1) {
+                parsedContent = parsedContent.substring(jsonStartIndex);
+              }
+              parsedContent = JSON.parse(parsedContent);
+            } catch (e) {
+              console.error('Failed to parse response content:', e);
+            }
+            console.log('Cancel result in cancel:', parsedContent);
+          } else {
+            console.log('Failed to send cancel request:', commandResult.message);
           }
-          parsedContent = JSON.parse(parsedContent);
-        } catch (e) {
-          console.error('Failed to parse response content:', e);
-        }
-        console.log('Cancel request sent successfully:', parsedContent);
-      } else {
-        console.log('Failed to send cancel request:', commandResult.message);
-      }
-      // }
+          // }
 
-      const closeResult = await closeConnection();
-      console.log('Connection closed:', closeResult.message);
+          const closeResult = await closeConnection();
+          console.log('Connection closed in cancel:', closeResult.message);
+        } else {
+          console.log('Failed to connect in cancel:', result.message);
+        }
+      } else {
+        console.log('No USB devices found');
+      }
     } catch (error) {
       console.error('Error during cancellation:', error);
+    }
+  };
+
+  const handleReleaseResponse = async () => {
+    try {
+      const devices = await getDeviceList();
+
+      if (devices.length > 0) {
+        const device = devices[0];
+        const result = await openConnection(device.deviceId);
+
+        if (result.success) {
+          console.log('Releasing Response...');
+
+          // Read response without sending any command
+          const commandResult = await sendCommand({
+            requestType: RequestType.HANDSHAKE_REQUEST,
+            content: "",
+            sequenceNumber: generateSequenceNumber(),
+            timeout: 500 // 0.5 seconds timeout
+          });
+
+          if (commandResult.success) {
+            console.log('Response received:', commandResult.parsedData);
+          } else if (commandResult.timeout) {
+            console.log('Response timed out:', commandResult.message);
+          } else {
+            console.log('Failed to read response:', commandResult.message);
+          }
+
+          // Close the connection when done
+          const closeResult = await closeConnection();
+          console.log('Connection closed:', closeResult.message);
+        } else {
+          console.log('Failed to connect:', result.message);
+        }
+      } else {
+        console.log('No USB devices found');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -246,24 +301,38 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
-        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={handleHandShake}>
-          <ThemedText style={{ color: 'white' }}>
-            Test Handshake
-          </ThemedText>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={handleTransactionConnection}>
           <ThemedText style={{ color: 'white' }}>
             Test Serial
           </ThemedText>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={handleRefundConnection}>
+        <TouchableOpacity style={styles.cancel} activeOpacity={0.8} onPress={handleCancelConnection}>
+          <ThemedText style={{ color: 'white' }}>
+            Cancel Serial
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Welcome!</ThemedText>
+        <HelloWave />
+        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={handleHandShake}>
+          <ThemedText style={{ color: 'white' }}>
+            Test Handshake
+          </ThemedText>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cancel} activeOpacity={0.8} onPress={handleRefundConnection}>
           <ThemedText style={{ color: 'white' }}>
             Test Void
           </ThemedText>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.cancel} activeOpacity={0.8} onPress={handleCancelConnection}>
+      </ThemedView>
+
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Welcome!</ThemedText>
+        <HelloWave />
+        <TouchableOpacity style={[styles.test, { backgroundColor: 'green' }]} activeOpacity={0.8} onPress={handleReleaseResponse}>
           <ThemedText style={{ color: 'white' }}>
-            Cancel Serial
+            Release Response
           </ThemedText>
         </TouchableOpacity>
       </ThemedView>

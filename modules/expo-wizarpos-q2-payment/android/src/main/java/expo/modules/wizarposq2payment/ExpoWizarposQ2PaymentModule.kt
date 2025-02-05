@@ -175,7 +175,7 @@ class ExpoWizarposQ2PaymentModule : Module() {
             println("Buffer is Emply!!!!!!!!!!!!")
             promise.resolve(mapOf(
               "success" to false,
-              "message" to "Timeout: No response received",
+              "message" to "Timeout: No response received!!",
               "timeout" to true,
               "command" to command
             ))
