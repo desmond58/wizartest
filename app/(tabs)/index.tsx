@@ -289,6 +289,10 @@ export default function HomeScreen() {
     }
   };
 
+  //---------------      K80 Custom Printer    -----------------//
+
+  const testPrint = async () => {
+  };
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -299,22 +303,22 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Wizarpos Payment Test!</ThemedText>
         <HelloWave />
+      </ThemedView>
+      <ThemedView style={styles.titleContainer}>
         <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={handleTransactionConnection}>
           <ThemedText style={{ color: 'white' }}>
-            Test Serial
+            Test Transaction
           </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.cancel} activeOpacity={0.8} onPress={handleCancelConnection}>
           <ThemedText style={{ color: 'white' }}>
-            Cancel Serial
+            Cancel Transaction
           </ThemedText>
         </TouchableOpacity>
       </ThemedView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
         <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={handleHandShake}>
           <ThemedText style={{ color: 'white' }}>
             Test Handshake
@@ -322,17 +326,42 @@ export default function HomeScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.cancel} activeOpacity={0.8} onPress={handleRefundConnection}>
           <ThemedText style={{ color: 'white' }}>
-            Test Void
+            Test Void / Refund
           </ThemedText>
         </TouchableOpacity>
       </ThemedView>
-
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
         <TouchableOpacity style={[styles.test, { backgroundColor: 'green' }]} activeOpacity={0.8} onPress={handleReleaseResponse}>
           <ThemedText style={{ color: 'white' }}>
             Release Response
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">K80 Custom Print Test!</ThemedText>
+        <HelloWave />
+      </ThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={testPrint}>
+          <ThemedText style={{ color: 'white' }}>
+            Test Print
+          </ThemedText>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={testPrint}>
+          <ThemedText style={{ color: 'white' }}>
+            ...
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={testPrint}>
+          <ThemedText style={{ color: 'white' }}>
+            ...
+          </ThemedText>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.test} activeOpacity={0.8} onPress={testPrint}>
+          <ThemedText style={{ color: 'white' }}>
+            ...
           </ThemedText>
         </TouchableOpacity>
       </ThemedView>
